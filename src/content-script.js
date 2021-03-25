@@ -33,7 +33,6 @@
             (mutation) => mutation.type === 'childList' && mutation.target.tagName === 'TBODY'
         );
 
-        console.log(mutationsList);
         if (shouldExecute) {
             execute();
         }
