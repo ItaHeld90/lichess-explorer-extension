@@ -2,6 +2,36 @@
     const boardContainerSelector = 'cg-container';
     const formatSelector = 'aside > .mselect';
     const widgetSelectorClassName = '__lichess-pieces-widget__';
+    const widgetContentClassName = '__lichess-pieces-widget-content__';
+
+    const pieceValues = {
+        king: 0,
+        pawn: 1,
+        knight: 3,
+        bishop: 3,
+        rook: 5,
+        queen: 9,
+    };
+
+    const pieceNames = Object.keys(pieceValues);
+
+    const basePieceCount = {
+        king: 1,
+        pawn: 8,
+        knight: 2,
+        bishop: 2,
+        rook: 2,
+        queen: 1,
+    };
+
+    const pieceSymbols = {
+        king: 'K',
+        pawn: 'P',
+        knight: 'N',
+        bishop: 'B',
+        rook: 'R',
+        queen: 'Q',
+    };
 
     const boardAppearanceObs = new MutationObserver(handleTopMutations);
     boardAppearanceObs.observe(document.body, { childList: true, subtree: true });
@@ -32,33 +62,14 @@
 
         if (!shouldExecute) return;
 
-        const blackPieces = [...document.querySelectorAll('piece.black:not(.ghost)')];
-        const whitePieces = [...document.querySelectorAll('piece.white:not(.ghost)')];
+        const whitePieceElements = [...document.querySelectorAll('piece.white:not(.ghost)')];
+        const blackPieceElements = [...document.querySelectorAll('piece.black:not(.ghost)')];
 
-        const piecesValues = {
-            rook: 5,
-            knight: 3,
-            bishop: 3,
-            queen: 9,
-            king: 0,
-            pawn: 1,
-        };
+        const [whitePieces, blackPieces] = [whitePieceElements, blackPieceElements].map((pieceElements) =>
+            pieceElements.map((el) => pieceNames.find((piece) => el.classList.contains(piece)))
+        );
 
-        const pieceNames = Object.keys(piecesValues);
-
-        let resBlack = calcSumPieces(blackPieces);
-        let resWhite = calcSumPieces(whitePieces);
-
-        let whiteAdvantage = resWhite - resBlack;
-        updateWidget(whiteAdvantage);
-
-        function calcSumPieces(pieces) {
-            let res = pieces.reduce(
-                (sum, curr) => sum + piecesValues[pieceNames.find((piece) => curr.classList.contains(piece))],
-                0
-            );
-            return res;
-        }
+        updateWidget(whitePieces, blackPieces);
     }
 
     function addWidgetToPage() {
@@ -77,9 +88,87 @@
         }
     }
 
-    function updateWidget(whiteAdvantage) {
+    function updateWidget(whitePieces, blackPieces) {
+        const [whitePiecesSum, blackPiecesSum] = [whitePieces, blackPieces].map((pieces) =>
+            pieces.reduce((sum, currPiece) => sum + pieceValues[currPiece], 0)
+        );
+
+        const [whitePiecesCount, blackPiecesCount] = [whitePieces, blackPieces].map((pieces) =>
+            countBy(pieces, identity)
+        );
+
+        const [whiteCapturedCount, blackCapturedCount] = [whitePiecesCount, blackPiecesCount].map((piecesCount) =>
+            mapValues(basePieceCount, (baseCnt, name) => baseCnt - (piecesCount[name] || 0))
+        );
+
+        const whiteAdvantage = whitePiecesSum - blackPiecesSum;
+
+        const [blackCapturesText, whiteCapturesText] = [whiteCapturedCount, blackCapturedCount].map((capturedCount) => {
+            const nonEmptyCaptures = Object.entries(capturedCount).filter(([, cnt]) => cnt > 0);
+            const sortedCaptures = sortBy(nonEmptyCaptures, ([pieceName]) => pieceValues[pieceName]);
+
+            return sortedCaptures.reduce((res, [captureName, cnt]) => `${res}${pieceSymbols[captureName]}x${cnt} `, '');
+        });
+
+        const whiteText =
+            'white: ' +
+            whiteCapturesText +
+            (whiteAdvantage > 0 ? ` +${whiteAdvantage}` : whiteAdvantage < 0 ? ` ${whiteAdvantage}` : '');
+
+        const blackText =
+            'black: ' +
+            blackCapturesText +
+            (whiteAdvantage > 0 ? ` ${-whiteAdvantage}` : whiteAdvantage < 0 ? ` +${Math.abs(whiteAdvantage)}` : '');
+
+        // Create Element
         const widget = document.querySelector(`.${widgetSelectorClassName}`) || addWidgetToPage();
 
-        widget.textContent = `white: ${whiteAdvantage > 0 ? '+' : ''}${whiteAdvantage}`;
+        const widgetContent = document.createElement('div');
+        widgetContent.classList.add(widgetContentClassName);
+
+        const whiteListElement = document.createElement('div');
+        whiteListElement.textContent = whiteText;
+
+        const blackListElement = document.createElement('div');
+        blackListElement.textContent = blackText;
+
+        widgetContent.append(whiteListElement);
+        widgetContent.append(blackListElement);
+
+        const existingContent = widget.querySelector(`.${widgetContentClassName}`);
+
+        if (existingContent) {
+            existingContent.replaceWith(widgetContent);
+        } else {
+            widget.append(widgetContent);
+        }
+    }
+
+    // Utils
+
+    function countBy(arr, countFn) {
+        return arr.reduce((res, item) => {
+            const key = countFn(item);
+            const val = res[key] ? res[key] + 1 : 1;
+            return {
+                ...res,
+                [key]: val,
+            };
+        }, {});
+    }
+
+    function sortBy(arr, sortFn) {
+        return arr.sort((a, b) => {
+            const [aVal, bVal] = [a, b].map(sortFn);
+            return aVal < bVal ? -1 : bVal < aVal ? 1 : 0;
+        });
+    }
+
+    function mapValues(obj, mapFn) {
+        return Object.entries(obj).reduce((res, [key, val]) => ({ ...res, [key]: mapFn(val, key) }), {});
+    }
+
+    function identity(val) {
+        return val;
     }
 })();
