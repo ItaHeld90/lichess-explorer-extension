@@ -12,5 +12,5 @@
             "js": ["src/piece-count.js"]
         }
     ],
-    "web_accessible_resources": ["src/*"]
+    "web_accessible_resources": ["src/*", "assets/*.png"]
 }

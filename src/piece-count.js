@@ -85,9 +85,6 @@
             widget.classList.add(widgetSelectorClassName);
             widget.style.padding = '10px';
 
-            const widgetContent = createWidgetContent('', '');
-            widget.append(widgetContent);
-
             return widget;
         }
     }
@@ -107,25 +104,42 @@
 
         const whiteAdvantage = whitePiecesSum - blackPiecesSum;
 
-        const [blackCapturesText, whiteCapturesText] = [whiteCapturedCount, blackCapturedCount].map((capturedCount) => {
-            const nonEmptyCaptures = Object.entries(capturedCount).filter(([, cnt]) => cnt > 0);
-            const sortedCaptures = sortBy(nonEmptyCaptures, ([pieceName]) => pieceValues[pieceName]);
+        const [blackSortedCaptures, whiteSortedCaptures] = [whiteCapturedCount, blackCapturedCount].map(
+            (capturedCount) => {
+                const nonEmptyCaptures = Object.entries(capturedCount).filter(([, cnt]) => cnt > 0);
+                const sortedCaptures = sortBy(nonEmptyCaptures, ([pieceName]) => pieceValues[pieceName]);
 
-            return sortedCaptures.reduce((res, [captureName, cnt]) => `${res}${pieceSymbols[captureName]}x${cnt} `, '');
-        });
+                return sortedCaptures;
+            }
+        );
 
-        const whiteText =
-            whiteCapturesText +
-            (whiteAdvantage > 0 ? ` +${whiteAdvantage}` : whiteAdvantage < 0 ? ` ${whiteAdvantage}` : '');
+        const whiteCaptureElements = whiteSortedCaptures.map(([pieceName, cnt]) =>
+            getCaptureElement(pieceName, cnt, 'black')
+        );
 
-        const blackText =
-            blackCapturesText +
-            (whiteAdvantage > 0 ? ` ${-whiteAdvantage}` : whiteAdvantage < 0 ? ` +${Math.abs(whiteAdvantage)}` : '');
+        const blackCaptureElements = blackSortedCaptures.map(([pieceName, cnt]) =>
+            getCaptureElement(pieceName, cnt, 'white')
+        );
+
+        const whiteStatusElement = document.createElement('div');
+        whiteStatusElement.style.marginTop = '20px';
+        const whiteAdvantageElement = document.createElement('span');
+        whiteAdvantageElement.innerText =
+            whiteAdvantage > 0 ? `+${whiteAdvantage}` : whiteAdvantage < 0 ? whiteAdvantage : '';
+        whiteStatusElement.append(...whiteCaptureElements, whiteAdvantageElement);
+
+        const blackStatusElement = document.createElement('div');
+        const blackAdvantageElement = document.createElement('span');
+        blackAdvantageElement.innerText =
+            whiteAdvantage > 0 ? -whiteAdvantage : whiteAdvantage < 0 ? `+${-whiteAdvantage}` : '';
+        blackStatusElement.append(...blackCaptureElements, blackAdvantageElement);
 
         // Create Element
         const widget = document.querySelector(`.${widgetSelectorClassName}`) || addWidgetToPage();
 
-        const widgetContent = createWidgetContent(whiteText, blackText);
+        const widgetContent = document.createElement('div');
+        widgetContent.classList.add(widgetContentClassName);
+        widgetContent.append(blackStatusElement, whiteStatusElement);
 
         const existingContent = widget.querySelector(`.${widgetContentClassName}`);
 
@@ -136,20 +150,18 @@
         }
     }
 
-    function createWidgetContent(whiteText, blackText) {
-        const widgetContent = document.createElement('div');
-        widgetContent.classList.add(widgetContentClassName);
+    function getCaptureElement(captureName, numCaptures, color) {
+        const captureElement = document.createElement('span');
 
-        const whiteListElement = document.createElement('div');
-        whiteListElement.textContent = `white: ${whiteText}`;
+        const pieceImg = document.createElement('img');
+        pieceImg.src = chrome.extension.getURL(`assets/${captureName} - ${color}.png`);
 
-        const blackListElement = document.createElement('div');
-        blackListElement.textContent = `black: ${blackText}`;
+        const multiplier = document.createElement('span');
+        multiplier.innerText = numCaptures > 1 ? `${numCaptures} x` : '';
 
-        widgetContent.append(whiteListElement);
-        widgetContent.append(blackListElement);
+        captureElement.append(multiplier, pieceImg);
 
-        return widgetContent;
+        return captureElement;
     }
 
     // Utils
