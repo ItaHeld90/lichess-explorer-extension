@@ -46,6 +46,7 @@
         );
 
         if (shouldExecute) {
+            addWidgetToPage();
             const pieceChangesObs = new MutationObserver(handlePiecesChanged);
             const boardNode = document.querySelector(boardContainerSelector);
             pieceChangesObs.observe(boardNode, { childList: true, subtree: true });
@@ -74,7 +75,6 @@
 
     function addWidgetToPage() {
         const formatSelectorEl = document.querySelector(formatSelector);
-
         const piecesWidget = createPiecesWidget();
         formatSelectorEl.insertAdjacentElement('afterend', piecesWidget);
 
@@ -84,6 +84,10 @@
             const widget = document.createElement('div');
             widget.classList.add(widgetSelectorClassName);
             widget.style.padding = '10px';
+
+            const widgetContent = createWidgetContent('', '');
+            widget.append(widgetContent);
+
             return widget;
         }
     }
@@ -111,29 +115,17 @@
         });
 
         const whiteText =
-            'white: ' +
             whiteCapturesText +
             (whiteAdvantage > 0 ? ` +${whiteAdvantage}` : whiteAdvantage < 0 ? ` ${whiteAdvantage}` : '');
 
         const blackText =
-            'black: ' +
             blackCapturesText +
             (whiteAdvantage > 0 ? ` ${-whiteAdvantage}` : whiteAdvantage < 0 ? ` +${Math.abs(whiteAdvantage)}` : '');
 
         // Create Element
         const widget = document.querySelector(`.${widgetSelectorClassName}`) || addWidgetToPage();
 
-        const widgetContent = document.createElement('div');
-        widgetContent.classList.add(widgetContentClassName);
-
-        const whiteListElement = document.createElement('div');
-        whiteListElement.textContent = whiteText;
-
-        const blackListElement = document.createElement('div');
-        blackListElement.textContent = blackText;
-
-        widgetContent.append(whiteListElement);
-        widgetContent.append(blackListElement);
+        const widgetContent = createWidgetContent(whiteText, blackText);
 
         const existingContent = widget.querySelector(`.${widgetContentClassName}`);
 
@@ -142,6 +134,22 @@
         } else {
             widget.append(widgetContent);
         }
+    }
+
+    function createWidgetContent(whiteText, blackText) {
+        const widgetContent = document.createElement('div');
+        widgetContent.classList.add(widgetContentClassName);
+
+        const whiteListElement = document.createElement('div');
+        whiteListElement.textContent = `white: ${whiteText}`;
+
+        const blackListElement = document.createElement('div');
+        blackListElement.textContent = `black: ${blackText}`;
+
+        widgetContent.append(whiteListElement);
+        widgetContent.append(blackListElement);
+
+        return widgetContent;
     }
 
     // Utils
