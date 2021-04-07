@@ -122,8 +122,9 @@
         );
 
         const whiteStatusElement = document.createElement('div');
+        whiteStatusElement.style.height = "30px";
         whiteStatusElement.style.display = "flex";
-        whiteStatusElement.style.alignItems = "center";
+        whiteStatusElement.style.alignItems = "flex-end";
         whiteStatusElement.style.marginTop = '20px';
 
         const whiteAdvantageElement = document.createElement('div');
@@ -132,8 +133,9 @@
         whiteStatusElement.append(...whiteCaptureElements, whiteAdvantageElement);
 
         const blackStatusElement = document.createElement('div');
+        blackStatusElement.style.height = "30px";
         blackStatusElement.style.display = "flex";
-        blackStatusElement.style.alignItems = "center";
+        blackStatusElement.style.alignItems = "flex-end";
 
         const blackAdvantageElement = document.createElement('div');
         blackAdvantageElement.innerText =
