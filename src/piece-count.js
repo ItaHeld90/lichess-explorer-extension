@@ -122,14 +122,20 @@
         );
 
         const whiteStatusElement = document.createElement('div');
+        whiteStatusElement.style.display = "flex";
+        whiteStatusElement.style.alignItems = "center";
         whiteStatusElement.style.marginTop = '20px';
-        const whiteAdvantageElement = document.createElement('span');
+
+        const whiteAdvantageElement = document.createElement('div');
         whiteAdvantageElement.innerText =
             whiteAdvantage > 0 ? `+${whiteAdvantage}` : '';
         whiteStatusElement.append(...whiteCaptureElements, whiteAdvantageElement);
 
         const blackStatusElement = document.createElement('div');
-        const blackAdvantageElement = document.createElement('span');
+        blackStatusElement.style.display = "flex";
+        blackStatusElement.style.alignItems = "center";
+
+        const blackAdvantageElement = document.createElement('div');
         blackAdvantageElement.innerText =
             whiteAdvantage < 0 ? `+${-whiteAdvantage}` : '';
         blackStatusElement.append(...blackCaptureElements, blackAdvantageElement);
@@ -151,7 +157,9 @@
     }
 
     function getCaptureElement(captureName, numCaptures, color) {
-        const captureElement = document.createElement('span');
+        const captureElement = document.createElement('div');
+        captureElement.style.display = "inline-flex";
+        captureElement.style.alignItems = "end";
 
         const pieceImg = document.createElement('img');
         pieceImg.src = chrome.extension.getURL(`assets/${captureName} - ${color}.png`);
