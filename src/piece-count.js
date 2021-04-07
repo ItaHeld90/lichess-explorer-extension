@@ -122,24 +122,30 @@
         );
 
         const whiteStatusElement = document.createElement('div');
-        whiteStatusElement.style.height = "30px";
-        whiteStatusElement.style.display = "flex";
-        whiteStatusElement.style.alignItems = "flex-end";
+        whiteStatusElement.style.height = '30px';
+        whiteStatusElement.style.display = 'flex';
+        whiteStatusElement.style.alignItems = 'flex-end';
         whiteStatusElement.style.marginTop = '20px';
 
         const whiteAdvantageElement = document.createElement('div');
-        whiteAdvantageElement.innerText =
-            whiteAdvantage > 0 ? `+${whiteAdvantage}` : '';
+        whiteAdvantageElement.style.lineHeight = '1em';
+        whiteAdvantageElement.style.marginLeft = '5px';
+        whiteAdvantageElement.style.color = 'green';
+        whiteAdvantageElement.style.fontWeight = 'bold';
+        whiteAdvantageElement.innerText = whiteAdvantage > 0 ? `+${whiteAdvantage}` : '';
         whiteStatusElement.append(...whiteCaptureElements, whiteAdvantageElement);
 
         const blackStatusElement = document.createElement('div');
-        blackStatusElement.style.height = "30px";
-        blackStatusElement.style.display = "flex";
-        blackStatusElement.style.alignItems = "flex-end";
+        blackStatusElement.style.height = '30px';
+        blackStatusElement.style.display = 'flex';
+        blackStatusElement.style.alignItems = 'flex-end';
 
         const blackAdvantageElement = document.createElement('div');
-        blackAdvantageElement.innerText =
-            whiteAdvantage < 0 ? `+${-whiteAdvantage}` : '';
+        blackAdvantageElement.style.lineHeight = '1em';
+        blackAdvantageElement.style.marginLeft = '5px';
+        blackAdvantageElement.style.color = 'green';
+        blackAdvantageElement.style.fontWeight = 'bold';
+        blackAdvantageElement.innerText = whiteAdvantage < 0 ? `+${-whiteAdvantage}` : '';
         blackStatusElement.append(...blackCaptureElements, blackAdvantageElement);
 
         // Create Element
@@ -160,16 +166,19 @@
 
     function getCaptureElement(captureName, numCaptures, color) {
         const captureElement = document.createElement('div');
-        captureElement.style.display = "inline-flex";
-        captureElement.style.alignItems = "flex-end";
+        captureElement.style.display = 'flex';
+        captureElement.style.alignItems = 'flex-end';
 
         const pieceImg = document.createElement('img');
         pieceImg.src = chrome.extension.getURL(`assets/${captureName} - ${color}.png`);
+        pieceImg.style.marginRight = '3px';
 
-        const multiplier = document.createElement('span');
-        multiplier.innerText = numCaptures > 1 ? `${numCaptures} x` : '';
+        const multiplier = document.createElement('div');
+        multiplier.style.lineHeight = '1em';
+        multiplier.innerText = numCaptures > 1 ? `x${numCaptures}` : '';
+        multiplier.style.marginRight = '4px';
 
-        captureElement.append(multiplier, pieceImg);
+        captureElement.append(pieceImg, multiplier);
 
         return captureElement;
     }
