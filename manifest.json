@@ -6,7 +6,11 @@
         {
             "matches": ["https://lichess.org/*"],
             "js": ["src/content-script.js"]
+        },
+        {
+            "matches": ["https://lichess.org/analysis*"],
+            "js": ["src/piece-count.js"]
         }
     ],
-    "web_accessible_resources": ["src/*"]
+    "web_accessible_resources": ["src/*", "assets/*.png"]
 }
