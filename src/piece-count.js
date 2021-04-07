@@ -122,16 +122,24 @@
         );
 
         const whiteStatusElement = document.createElement('div');
+        whiteStatusElement.style.height = "30px";
+        whiteStatusElement.style.display = "flex";
+        whiteStatusElement.style.alignItems = "flex-end";
         whiteStatusElement.style.marginTop = '20px';
-        const whiteAdvantageElement = document.createElement('span');
+
+        const whiteAdvantageElement = document.createElement('div');
         whiteAdvantageElement.innerText =
-            whiteAdvantage > 0 ? `+${whiteAdvantage}` : whiteAdvantage < 0 ? whiteAdvantage : '';
+            whiteAdvantage > 0 ? `+${whiteAdvantage}` : '';
         whiteStatusElement.append(...whiteCaptureElements, whiteAdvantageElement);
 
         const blackStatusElement = document.createElement('div');
-        const blackAdvantageElement = document.createElement('span');
+        blackStatusElement.style.height = "30px";
+        blackStatusElement.style.display = "flex";
+        blackStatusElement.style.alignItems = "flex-end";
+
+        const blackAdvantageElement = document.createElement('div');
         blackAdvantageElement.innerText =
-            whiteAdvantage > 0 ? -whiteAdvantage : whiteAdvantage < 0 ? `+${-whiteAdvantage}` : '';
+            whiteAdvantage < 0 ? `+${-whiteAdvantage}` : '';
         blackStatusElement.append(...blackCaptureElements, blackAdvantageElement);
 
         // Create Element
@@ -151,7 +159,9 @@
     }
 
     function getCaptureElement(captureName, numCaptures, color) {
-        const captureElement = document.createElement('span');
+        const captureElement = document.createElement('div');
+        captureElement.style.display = "inline-flex";
+        captureElement.style.alignItems = "flex-end";
 
         const pieceImg = document.createElement('img');
         pieceImg.src = chrome.extension.getURL(`assets/${captureName} - ${color}.png`);
