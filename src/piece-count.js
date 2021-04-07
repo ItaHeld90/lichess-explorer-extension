@@ -161,7 +161,7 @@
     function getCaptureElement(captureName, numCaptures, color) {
         const captureElement = document.createElement('div');
         captureElement.style.display = "inline-flex";
-        captureElement.style.alignItems = "end";
+        captureElement.style.alignItems = "flex-end";
 
         const pieceImg = document.createElement('img');
         pieceImg.src = chrome.extension.getURL(`assets/${captureName} - ${color}.png`);
