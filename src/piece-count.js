@@ -125,13 +125,13 @@
         whiteStatusElement.style.marginTop = '20px';
         const whiteAdvantageElement = document.createElement('span');
         whiteAdvantageElement.innerText =
-            whiteAdvantage > 0 ? `+${whiteAdvantage}` : whiteAdvantage < 0 ? whiteAdvantage : '';
+            whiteAdvantage > 0 ? `+${whiteAdvantage}` : '';
         whiteStatusElement.append(...whiteCaptureElements, whiteAdvantageElement);
 
         const blackStatusElement = document.createElement('div');
         const blackAdvantageElement = document.createElement('span');
         blackAdvantageElement.innerText =
-            whiteAdvantage > 0 ? -whiteAdvantage : whiteAdvantage < 0 ? `+${-whiteAdvantage}` : '';
+            whiteAdvantage < 0 ? `+${-whiteAdvantage}` : '';
         blackStatusElement.append(...blackCaptureElements, blackAdvantageElement);
 
         // Create Element
