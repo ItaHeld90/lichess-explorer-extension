@@ -121,31 +121,17 @@
             getCaptureElement(pieceName, cnt, 'white')
         );
 
-        const whiteStatusElement = document.createElement('div');
-        whiteStatusElement.style.height = '30px';
-        whiteStatusElement.style.display = 'flex';
-        whiteStatusElement.style.alignItems = 'flex-end';
+        const whiteStatusElement = getPlayerStatusElement();
         whiteStatusElement.style.marginTop = '20px';
 
-        const whiteAdvantageElement = document.createElement('div');
-        whiteAdvantageElement.style.lineHeight = '1em';
-        whiteAdvantageElement.style.marginLeft = '5px';
-        whiteAdvantageElement.style.color = 'green';
-        whiteAdvantageElement.style.fontWeight = 'bold';
-        whiteAdvantageElement.innerText = whiteAdvantage > 0 ? `+${whiteAdvantage}` : '';
+        const whiteAdvantageText = whiteAdvantage > 0 ? `+${whiteAdvantage}` : '';
+        const whiteAdvantageElement = getAdvantageElement(whiteAdvantageText);
         whiteStatusElement.append(...whiteCaptureElements, whiteAdvantageElement);
 
-        const blackStatusElement = document.createElement('div');
-        blackStatusElement.style.height = '30px';
-        blackStatusElement.style.display = 'flex';
-        blackStatusElement.style.alignItems = 'flex-end';
+        const blackStatusElement = getPlayerStatusElement();
 
-        const blackAdvantageElement = document.createElement('div');
-        blackAdvantageElement.style.lineHeight = '1em';
-        blackAdvantageElement.style.marginLeft = '5px';
-        blackAdvantageElement.style.color = 'green';
-        blackAdvantageElement.style.fontWeight = 'bold';
-        blackAdvantageElement.innerText = whiteAdvantage < 0 ? `+${-whiteAdvantage}` : '';
+        const blackAdvantageText = whiteAdvantage < 0 ? `+${-whiteAdvantage}` : '';
+        const blackAdvantageElement = getAdvantageElement(blackAdvantageText);
         blackStatusElement.append(...blackCaptureElements, blackAdvantageElement);
 
         // Create Element
@@ -162,6 +148,26 @@
         } else {
             widget.append(widgetContent);
         }
+    }
+
+    function getPlayerStatusElement() {
+        const statusElement = document.createElement('div');
+        statusElement.style.height = '30px';
+        statusElement.style.display = 'flex';
+        statusElement.style.alignItems = 'flex-end';
+
+        return statusElement;
+    }
+
+    function getAdvantageElement(advantage) {
+        const advantageElement = document.createElement('div');
+        advantageElement.style.lineHeight = '1em';
+        advantageElement.style.marginLeft = '5px';
+        advantageElement.style.color = 'green';
+        advantageElement.style.fontWeight = 'bold';
+        advantageElement.innerText = advantage;
+
+        return advantageElement;
     }
 
     function getCaptureElement(captureName, numCaptures, color) {
