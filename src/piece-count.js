@@ -1,5 +1,5 @@
 (function init() {
-    const boardContainerSelector = 'cg-container';
+    const boardContainerSelector = 'cg-helper';
     const formatSelector = 'aside > .mselect';
     const widgetSelectorClassName = '__lichess-pieces-widget__';
     const widgetContentClassName = '__lichess-pieces-widget-content__';
@@ -36,8 +36,10 @@
     const boardAppearanceObs = new MutationObserver(handleTopMutations);
     boardAppearanceObs.observe(document.body, { childList: true, subtree: true });
 
-    function handleTopMutations(mutationsList) {
-        const shouldExecute = [...mutationsList].some(
+    function handleTopMutations(mutations) {
+        const mutationsList = [...mutations];
+
+        const shouldAddWidget = mutationsList.some(
             (mutation) =>
                 mutation.type === 'childList' &&
                 [...mutation.addedNodes].some(
@@ -45,11 +47,23 @@
                 )
         );
 
-        if (shouldExecute) {
+        const shouldRemoveWidget = mutationsList.some(
+            (mutation) =>
+                mutation.type === 'childList' &&
+                [...mutation.removedNodes].some(
+                    (node) => node instanceof HTMLElement && node.matches(boardContainerSelector)
+                )
+        );
+
+        if (shouldAddWidget) {
             addWidgetToPage();
             const pieceChangesObs = new MutationObserver(handlePiecesChanged);
             const boardNode = document.querySelector(boardContainerSelector);
             pieceChangesObs.observe(boardNode, { childList: true, subtree: true });
+        }
+
+        if (shouldRemoveWidget) {
+            removeWidgetFromPage();
         }
     }
 
@@ -87,6 +101,11 @@
 
             return widget;
         }
+    }
+
+    function removeWidgetFromPage() {
+        const widgetElement = document.querySelector(`.${widgetSelectorClassName}`);
+        widgetElement.remove();
     }
 
     function updateWidget(whitePieces, blackPieces) {
