@@ -161,20 +161,21 @@
         const blackAdvantageElement = getAdvantageElement(blackAdvantageText);
         blackStatusElement.append(...blackCaptureElements, blackAdvantageElement);
 
-        const bottomStatusElement = orientation === 'white' ? whiteStatusElement : blackStatusElement;
-        bottomStatusElement.style.marginTop = '20px';
-
-        const widgetStatusElements =
+        const statusElements =
             orientation === 'white'
                 ? [blackStatusElement, whiteStatusElement]
                 : [whiteStatusElement, blackStatusElement];
+
+        const [topStatusElement, bottomStatusElement] = statusElements;
+        bottomStatusElement.style.bottom = '20%';
+        topStatusElement.style.top = '20%';
 
         // Create Element
         const widget = document.querySelector(`.${widgetSelectorClassName}`) || addWidgetToPage();
 
         const widgetContent = document.createElement('div');
         widgetContent.classList.add(widgetContentClassName);
-        widgetContent.append(...widgetStatusElements);
+        widgetContent.append(...statusElements);
 
         const existingContent = widget.querySelector(`.${widgetContentClassName}`);
 
@@ -190,6 +191,7 @@
         statusElement.style.height = '30px';
         statusElement.style.display = 'flex';
         statusElement.style.alignItems = 'flex-end';
+        statusElement.style.position = 'absolute';
 
         return statusElement;
     }
