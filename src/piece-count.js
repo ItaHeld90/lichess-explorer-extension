@@ -1,5 +1,6 @@
 (function init() {
     const boardContainerSelector = 'cg-helper';
+    const boardWrapperSelector = '.cg-wrap';
     const formatSelector = 'aside > .mselect';
     const widgetSelectorClassName = '__lichess-pieces-widget__';
     const widgetContentClassName = '__lichess-pieces-widget-content__';
@@ -22,15 +23,6 @@
         bishop: 2,
         rook: 2,
         queen: 1,
-    };
-
-    const pieceSymbols = {
-        king: 'K',
-        pawn: 'P',
-        knight: 'N',
-        bishop: 'B',
-        rook: 'R',
-        queen: 'Q',
     };
 
     const boardAppearanceObs = new MutationObserver(handleTopMutations);
@@ -57,13 +49,28 @@
 
         if (shouldAddWidget) {
             addWidgetToPage();
+
+            // observe pieces change
             const pieceChangesObs = new MutationObserver(handlePiecesChanged);
             const boardNode = document.querySelector(boardContainerSelector);
             pieceChangesObs.observe(boardNode, { childList: true, subtree: true });
+
+            // observe orientation change
+            const orientationChangeObs = new MutationObserver(handleOrientationChange);
+            const boardWrapperNode = document.querySelector(boardWrapperSelector);
+            orientationChangeObs.observe(boardWrapperNode, { attributes: true });
         }
 
         if (shouldRemoveWidget) {
             removeWidgetFromPage();
+        }
+    }
+
+    function handleOrientationChange(mutationsList) {
+        const shouldUpdateWidget = [...mutationsList].some((mutation) => mutation.attributeName === 'class');
+
+        if (shouldUpdateWidget) {
+            updateWidget();
         }
     }
 
@@ -77,14 +84,7 @@
 
         if (!shouldExecute) return;
 
-        const whitePieceElements = [...document.querySelectorAll('piece.white:not(.ghost)')];
-        const blackPieceElements = [...document.querySelectorAll('piece.black:not(.ghost)')];
-
-        const [whitePieces, blackPieces] = [whitePieceElements, blackPieceElements].map((pieceElements) =>
-            pieceElements.map((el) => pieceNames.find((piece) => el.classList.contains(piece)))
-        );
-
-        updateWidget(whitePieces, blackPieces);
+        updateWidget();
     }
 
     function addWidgetToPage() {
@@ -108,7 +108,16 @@
         widgetElement.remove();
     }
 
-    function updateWidget(whitePieces, blackPieces) {
+    function updateWidget() {
+        const whitePieceElements = [...document.querySelectorAll('piece.white:not(.ghost)')];
+        const blackPieceElements = [...document.querySelectorAll('piece.black:not(.ghost)')];
+        const boardWrapperElement = document.querySelector(boardWrapperSelector);
+        const orientation = boardWrapperElement.classList.contains('orientation-black') ? 'black' : 'white';
+
+        const [whitePieces, blackPieces] = [whitePieceElements, blackPieceElements].map((pieceElements) =>
+            pieceElements.map((el) => pieceNames.find((piece) => el.classList.contains(piece)))
+        );
+
         const [whitePiecesSum, blackPiecesSum] = [whitePieces, blackPieces].map((pieces) =>
             pieces.reduce((sum, currPiece) => sum + pieceValues[currPiece], 0)
         );
@@ -141,7 +150,6 @@
         );
 
         const whiteStatusElement = getPlayerStatusElement();
-        whiteStatusElement.style.marginTop = '20px';
 
         const whiteAdvantageText = whiteAdvantage > 0 ? `+${whiteAdvantage}` : '';
         const whiteAdvantageElement = getAdvantageElement(whiteAdvantageText);
@@ -153,12 +161,20 @@
         const blackAdvantageElement = getAdvantageElement(blackAdvantageText);
         blackStatusElement.append(...blackCaptureElements, blackAdvantageElement);
 
+        const bottomStatusElement = orientation === 'white' ? whiteStatusElement : blackStatusElement;
+        bottomStatusElement.style.marginTop = '20px';
+
+        const widgetStatusElements =
+            orientation === 'white'
+                ? [blackStatusElement, whiteStatusElement]
+                : [whiteStatusElement, blackStatusElement];
+
         // Create Element
         const widget = document.querySelector(`.${widgetSelectorClassName}`) || addWidgetToPage();
 
         const widgetContent = document.createElement('div');
         widgetContent.classList.add(widgetContentClassName);
-        widgetContent.append(blackStatusElement, whiteStatusElement);
+        widgetContent.append(...widgetStatusElements);
 
         const existingContent = widget.querySelector(`.${widgetContentClassName}`);
 
