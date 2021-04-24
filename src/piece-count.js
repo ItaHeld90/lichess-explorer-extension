@@ -32,23 +32,20 @@
         const mutationsList = [...mutations];
 
         const shouldAddWidget = mutationsList.some(
-            (mutation) =>
-                mutation.type === 'childList' &&
-                [...mutation.addedNodes].some(
-                    (node) => node instanceof HTMLElement && node.matches(boardContainerSelector)
-                )
+            (mutation) => mutation.type === 'childList' && [...mutation.addedNodes].some(isBoardContainerNode)
         );
 
         const shouldRemoveWidget = mutationsList.some(
-            (mutation) =>
-                mutation.type === 'childList' &&
-                [...mutation.removedNodes].some(
-                    (node) => node instanceof HTMLElement && node.matches(boardContainerSelector)
-                )
+            (mutation) => mutation.type === 'childList' && [...mutation.removedNodes].some(isBoardContainerNode)
         );
+
+        if (shouldRemoveWidget) {
+            removeWidgetFromPage();
+        }
 
         if (shouldAddWidget) {
             addWidgetToPage();
+            updateWidget();
 
             // observe pieces change
             const pieceChangesObs = new MutationObserver(handlePiecesChanged);
@@ -60,10 +57,13 @@
             const boardWrapperNode = document.querySelector(boardWrapperSelector);
             orientationChangeObs.observe(boardWrapperNode, { attributes: true });
         }
+    }
 
-        if (shouldRemoveWidget) {
-            removeWidgetFromPage();
-        }
+    function isBoardContainerNode(node) {
+        return (
+            node instanceof HTMLElement &&
+            [boardContainerSelector, boardWrapperSelector].some((selector) => node.matches(selector))
+        );
     }
 
     function handleOrientationChange(mutationsList) {
