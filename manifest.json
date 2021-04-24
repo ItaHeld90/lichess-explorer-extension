@@ -9,7 +9,7 @@
         },
         {
             "matches": ["https://lichess.org/analysis*"],
-            "js": ["src/piece-count.js", "src/copy-button.js"]
+            "js": ["src/piece-count.js", "src/pgn-buttons.js"]
         }
     ],
     "web_accessible_resources": ["src/*", "assets/*.png"]

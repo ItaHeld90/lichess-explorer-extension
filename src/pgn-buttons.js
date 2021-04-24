@@ -13,7 +13,7 @@
         const mutationsList = [...mutations];
 
         const shouldAddButtons = mutationsList.some((mutation) =>
-            [...mutation.addedNodes, ...mutation.removedNodes].some(isCopyablesNode)
+            [...mutation.addedNodes].some(isCopyablesNode)
         );
 
         if (shouldAddButtons) {
