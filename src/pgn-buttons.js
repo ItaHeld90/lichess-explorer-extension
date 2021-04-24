@@ -2,6 +2,7 @@
     const pgnContainerSelector = '.pgn';
     const pgnTextAreaSelector = '.pgn textarea';
     const copyablesSelector = '.copyables';
+    const importButtonSelector = '.pgn button.button.action'
     const buttonsContainerClassName = '__lichess-pgn-buttons-widget__';
 
     window.addEventListener('load', addButtons);
@@ -59,7 +60,9 @@
 
             reader.onload = () => {
                 const pgnTextAreaElem = document.querySelector(pgnTextAreaSelector);
+                const importButton = document.querySelector(importButtonSelector);
                 pgnTextAreaElem.value = reader.result;
+                importButton.click();
             };
 
             reader.readAsText(file);
