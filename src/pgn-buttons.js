@@ -2,7 +2,7 @@
     const pgnContainerSelector = '.pgn';
     const pgnTextAreaSelector = '.pgn textarea';
     const copyablesSelector = '.copyables';
-    const importButtonSelector = '.pgn button.button.action'
+    const importButtonSelector = '.pgn button.button.action';
     const buttonsContainerClassName = '__lichess-pgn-buttons-widget__';
 
     window.addEventListener('load', addButtons);
@@ -13,9 +13,7 @@
     function handleTopMutations(mutations) {
         const mutationsList = [...mutations];
 
-        const shouldAddButtons = mutationsList.some((mutation) =>
-            [...mutation.addedNodes].some(isCopyablesNode)
-        );
+        const shouldAddButtons = mutationsList.some((mutation) => [...mutation.addedNodes].some(isCopyablesNode));
 
         if (shouldAddButtons) {
             addButtons();
@@ -54,18 +52,16 @@
         fileUploader.type = 'file';
         fileUploader.accept = '.pgn';
 
-        fileUploader.addEventListener('change', function handleFiles() {
+        fileUploader.addEventListener('change', async function handleFiles() {
             const file = this.files[0];
-            const reader = new FileReader();
 
-            reader.onload = () => {
-                const pgnTextAreaElem = document.querySelector(pgnTextAreaSelector);
-                const importButton = document.querySelector(importButtonSelector);
-                pgnTextAreaElem.value = reader.result;
-                importButton.click();
-            };
+            const fileContent = await readFileAsText(file);
 
-            reader.readAsText(file);
+            // apply PGN
+            const pgnTextAreaElem = document.querySelector(pgnTextAreaSelector);
+            const importButton = document.querySelector(importButtonSelector);
+            pgnTextAreaElem.value = fileContent;
+            importButton.click();
         });
 
         uploadPGNButton.addEventListener('click', () => {
@@ -73,6 +69,18 @@
         });
 
         return uploadPGNButton;
+    }
+
+    function readFileAsText(file) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+
+            reader.onload = () => {
+                resolve(reader.result);
+            };
+
+            reader.readAsText(file);
+        });
     }
 
     function createCopyPGNButton() {
